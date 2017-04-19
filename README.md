@@ -1,9 +1,14 @@
-# api documentation for  [gulp-todo (v5.3.0)](https://github.com/pgilad/gulp-todo#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-todo.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-todo) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-todo.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-todo)
+# npmdoc-gulp-todo
+
+#### api documentation for  [gulp-todo (v5.3.0)](https://github.com/pgilad/gulp-todo#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-todo.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-todo) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-todo.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-todo)
+
 #### Generate a TODO.md file from comments of files in stream
 
-[![NPM](https://nodei.co/npm/gulp-todo.png?downloads=true)](https://www.npmjs.com/package/gulp-todo)
+[![NPM](https://nodei.co/npm/gulp-todo.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/gulp-todo)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/screenCapture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-gulp-todo_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/apidoc.html)
+- [https://npmdoc.github.io/node-npmdoc-gulp-todo/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/apidoc.html)
+
+[![apidoc](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/screenCapture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/apidoc.html)
 
 ![npmPackageListing](https://npmdoc.github.io/node-npmdoc-gulp-todo/build/screenCapture.npmPackageListing.svg)
 
@@ -18,7 +23,6 @@
 {
     "author": {
         "name": "Gilad Peleg",
-        "email": "giladp007@gmail.com",
         "url": "http://giladpeleg.com"
     },
     "bugs": {
@@ -69,13 +73,11 @@
     "main": "index.js",
     "maintainers": [
         {
-            "name": "pgilad",
-            "email": "giladp007@gmail.com"
+            "name": "pgilad"
         }
     ],
     "name": "gulp-todo",
     "optionalDependencies": {},
-    "readme": "ERROR: No README data found!",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/pgilad/gulp-todo.git"
@@ -86,80 +88,6 @@
     },
     "version": "5.3.0"
 }
-```
-
-
-
-# <a name="apidoc.tableOfContents"></a>[table of contents](#apidoc.tableOfContents)
-
-#### [module gulp-todo](#apidoc.module.gulp-todo)
-1.  [function <span class="apidocSignatureSpan">gulp-todo.</span>reporter (reporter, options)](#apidoc.element.gulp-todo.reporter)
-
-
-
-# <a name="apidoc.module.gulp-todo"></a>[module gulp-todo](#apidoc.module.gulp-todo)
-
-#### <a name="apidoc.element.gulp-todo.reporter"></a>[function <span class="apidocSignatureSpan">gulp-todo.</span>reporter (reporter, options)](#apidoc.element.gulp-todo.reporter)
-- description and source-code
-```javascript
-reporter = function (reporter, options) {
-    options = options || {};
-    if (!reporter) {
-        throw new PluginError('Reporter is required');
-    }
-    options.reporter = reporter;
-    var fileName = options.fileName;
-    delete options.fileName;
-    return through.obj(function (file, enc, cb) {
-        if (file.isNull()) {
-            cb(null, file);
-            return;
-        }
-
-        if (file.isStream()) {
-            cb(new PluginError(pluginName, 'Streaming not supported'));
-            return;
-        }
-
-        // replace contents with requested reporter contents
-        if (file.todos && file.todos.length) {
-            var newContents;
-            try {
-                newContents = leasot.reporter(file.todos, options);
-            } catch (e) {
-                cb(new gutil.PluginError(pluginName, e));
-                return;
-            }
-
-            if (fileName) {
-                file.path = path.join(file.base, fileName);
-            }
-            file.contents = new Buffer(newContents);
-        }
-
-        cb(null, file);
-    });
-}
-```
-- example usage
-```shell
-...
-});
-
-// output once in markdown and then output a json file as well
-gulp.task('todo-reporters', function() {
-    gulp.src('js/**/*.js')
-        .pipe(todo())
-        .pipe(gulp.dest('./')) //output todo.md as markdown
-        .pipe(todo.reporter('json', {fileName: 'todo.json'}))
-        .pipe(gulp.dest('./')) //output todo.json as json
-});
-
-
-// Delete the todo.md file if no todos were found
-var gulpIf = require('gulp-if');
-var del = require('del');
-...
 ```
 
 

@@ -56,6 +56,15 @@
 
         <li>
 
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-todo.gulp-todo">
+            function <span class="apidocSignatureSpan"></span>gulp-todo
+            <span class="apidocSignatureSpan">(options)</span>
+            </a>
+
+        </li>
+
+        <li>
+
             <a class="apidocElementLiA" href="#apidoc.element.gulp-todo.reporter">
             function <span class="apidocSignatureSpan">gulp-todo.</span>reporter
             <span class="apidocSignatureSpan">(reporter, options)</span>
@@ -69,6 +78,103 @@
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.gulp-todo" id="apidoc.module.gulp-todo">module gulp-todo</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-todo.gulp-todo" id="apidoc.element.gulp-todo.gulp-todo">
+        function <span class="apidocSignatureSpan"></span>gulp-todo
+        <span class="apidocSignatureSpan">(options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-todo = function (options) {
+    options = defaults(options || {}, {
+        fileName: 'TODO.md',
+        verbose: false,
+        absolute: false,
+        skipUnsupported: false,
+        reporter: 'markdown'
+    });
+    var config = omit(options, ['fileName', 'verbose', 'absolute']);
+    var firstFile;
+    var comments = [];
+
+    return through.obj(function collectTodos(file, enc, cb) {
+            if (file.isNull()) {
+                cb(null, file);
+                return;
+            }
+
+            if (file.isStream()) {
+                cb(new PluginError(pluginName, 'Streaming not supported'));
+                return;
+            }
+            firstFile = firstFile || file;
+            //get extension - assume .js as default
+            var ext = path.extname(file.path) || '.js';
+            //check if parser for filetype exists
+            if (!leasot.isExtSupported(ext)) {
+                if (!options.skipUnsupported) {
+                    var msg = ['File:', file.path, '- Extension', gutil.colors.red(ext),
+                        'is not supported'
+                    ].join(' ');
+                    cb(new PluginError(pluginName, msg));
+                    return;
+                } else if (options.verbose) {
+                    var msg = ['Skipping file', file.path, 'with extension',
+                                    gutil.colors.red(ext), 'as it is unsupported'].join(' ');
+                    gutil.log(msg);
+                }
+                cb();
+                return;
+            }
+            var filePath;
+            if (options.absolute) {
+                filePath = file.path;
+            } else {
+                filePath = file.path &amp;&amp; file.relative || file.path;
+            }
+            var _comments = leasot.parse({
+                ext: ext,
+                content: file.contents.toString('utf8'),
+                fileName: filePath,
+                customTags: config.customTags,
+                withInlineFiles: config.withInlineFiles
+            });
+            if (options.verbose) {
+                logCommentsToConsole(_comments);
+            }
+            comments = comments.concat(_comments);
+            cb();
+        },
+        function reportTodos(cb) {
+            if (!firstFile) {
+                cb();
+                return;
+            }
+            var newContents;
+            try {
+                newContents = leasot.reporter(comments, config);
+            } catch (e) {
+                cb(new gutil.PluginError(pluginName, e));
+                return;
+            }
+
+            var todoFile = new gutil.File({
+                cwd: firstFile.cwd,
+                base: firstFile.base,
+                path: path.join(firstFile.base, options.fileName),
+                contents: new Buffer(newContents)
+            });
+            // also pass along comments object for future reporters
+            todoFile.todos = comments;
+            this.push(todoFile);
+            cb();
+        });
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 
     <h2>
